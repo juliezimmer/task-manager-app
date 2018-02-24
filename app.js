@@ -10,6 +10,10 @@ loadEventListeners();
 
 // Load all event Listeners
 function loadEventListeners() {
+   // DOM load event
+   // after the DOM has loaded, this gets all the tasks from local storage.
+   document.addEventListener('DOMContentLoaded', getTasks);
+
    // Add task event listener
    form.addEventListener('submit', addTask);
 
@@ -21,6 +25,29 @@ function loadEventListeners() {
 
    // filter task event 
    filter.addEventListener('keyup', filterTasks);
+}
+
+// Get Tasks from local storage
+function getTasks(){
+   let tasks;
+   // check  local storage for any tasks
+   if (localStorage.getItem('tasks') === null){
+      tasks = [];
+   } else {
+      tasks = JSON.parse(localStorage.getItem('tasks'));
+   }
+   
+   // loop through each task in the array
+   tasks.forEach(function (task){
+      const li = document.createElement('li');
+      li.className = 'collection-item';
+      li.appendChild(document.createTextNode(task));
+      const link = document.createElement('a');
+      link.className = 'delete-item secondary-content';
+      link.innerHTML = '<i class="fa fa-remove"></i>';
+      li.appendChild(link);
+      taskList.appendChild(li);
+   });
 }
 
 // Add Task
@@ -55,9 +82,26 @@ function addTask(e) {
    li.appendChild(link);
    taskList.appendChild(li);
 
+   // adding task to local storage
+   storeTask(taskInput.value);
+
    // Clear Input
    taskInput.value = '';
    e.preventDefault();
+}
+
+// Store task
+function storeTask(task) {
+   let tasks;
+   // check  local storage for any tasks
+   if (localStorage.getItem('tasks') === null){
+      tasks = [];
+   } else {
+      tasks = JSON.parse(localStorage.getItem('tasks'));
+   }
+   // add the task to array in storage 
+   tasks.push(task);
+   localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 function removeTask(e) {
@@ -72,9 +116,32 @@ function removeTask(e) {
       
       // when the icon is clicked, the whole li should be removed, which is the parent of the parent of the icon. The parent of the icon is the <a> tag. The parent of the <a> tag is the <li>.
       e.target.parentElement.parentElement.remove();
+
+      // remove from local storage
+      // calls removeTaskFromStorage function
+      removeTaskFromStorage(e.target.parentElement.parentElement);
       }
    }
 }
+
+// Remove from local storage
+function removeTaskFromStorage(taskItem) {
+   let tasks;
+   // check  local storage for any tasks
+   if (localStorage.getItem('tasks') === null){
+      tasks = [];
+   } else {
+      tasks = JSON.parse(localStorage.getItem('tasks'));
+   }
+   tasks.forEach(function(task, index){
+      // textContent is the actual text of the task
+      if(taskItem.textContent === task) {
+         tasks.splice(index, 1);
+      }
+   });
+   // reset local storage after task has been removed.
+   localStorage.setItem('tasks', JSON.stringify(tasks));
+} 
 
 // Clear tasks
 function clearTasks() {
@@ -86,7 +153,14 @@ function clearTasks() {
    while (taskList.firstChild) { 
       taskList.removeChild(taskList.firstChild);
    }
+   // calls clearTasksFromLocalStorage function
+   clearTasksFromLocalStorage();
 }  
+
+// Clear Tasks From Local Storage
+function clearTasksFromLocalStorage(){
+   localStorage.clear();
+}
 
 // filter tasks function 
 function filterTasks(e) {
@@ -102,9 +176,6 @@ function filterTasks(e) {
          task.style.display = 'none';
       }
    });
-    
-
-
 }
 
 
