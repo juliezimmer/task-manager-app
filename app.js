@@ -91,7 +91,7 @@ function addTask(e) {
 }
 
 // Store task
-function storeTask(task) {
+function storeTaskInLocalStorage(task) {
    let tasks;
    // check  local storage for any tasks
    if (localStorage.getItem('tasks') === null){
@@ -104,28 +104,27 @@ function storeTask(task) {
    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
+// Remove Task from List
 function removeTask(e) {
    // targeting the <a> tag link
    // when the "x" is clicked, the icon is targeted (the <i> tag). We need to target the parent, which is the <a> tag. 
    // this checks whether the parent element class list contains delete-item
    if (e.target.parentElement.classList.contains('delete-item')) {
-      console.log(e.target); // <i class="fa fa-remove"></i>
-
-      // confirmation
+      // confirmation pop up
       if(confirm("Are you sure you want to delete this item?")) {
       
       // when the icon is clicked, the whole li should be removed, which is the parent of the parent of the icon. The parent of the icon is the <a> tag. The parent of the <a> tag is the <li>.
-      e.target.parentElement.parentElement.remove();
+         e.target.parentElement.parentElement.remove();
 
       // remove from local storage
       // calls removeTaskFromStorage function
-      removeTaskFromStorage(e.target.parentElement.parentElement);
+      removeTaskFromLocalStorage(e.target.parentElement.parentElement);
       }
    }
 }
 
 // Remove from local storage
-function removeTaskFromStorage(taskItem) {
+function removeTaskFromLocalStorage(taskItem) {
    let tasks;
    // check  local storage for any tasks
    if (localStorage.getItem('tasks') === null){
